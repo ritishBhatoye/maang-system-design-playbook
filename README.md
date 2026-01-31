@@ -42,7 +42,15 @@ maang-system-design-playbook/
 │
 ├── README.md
 │
-├── fundamentals/                    # Start here - Core principles
+├── 01-interview-skills/              # 🎯 Start here - Learn how to interview
+│   ├── 01-maang-interview-flow.md
+│   ├── 02-clarifying-questions.md
+│   ├── 03-how-to-communicate.md
+│   ├── 04-how-to-explain-tradeoffs.md
+│   ├── 05-common-interview-phrases.md
+│   └── 06-sample-interviews.md
+│
+├── 02-fundamentals/                   # 📚 Core principles
 │   ├── 01-architecture-basics.md
 │   ├── 02-scalability-basics.md
 │   ├── 03-latency-throughput.md
@@ -51,7 +59,7 @@ maang-system-design-playbook/
 │   ├── 06-capacity-estimation.md
 │   └── 07-concurrency.md
 │
-├── building-blocks/                  # System components
+├── 03-building-blocks/                # 🧱 System components
 │   ├── 01-load-balancers.md
 │   ├── 02-databases-sql-nosql.md
 │   ├── 03-caches.md
@@ -61,14 +69,14 @@ maang-system-design-playbook/
 │   ├── 07-indexing.md
 │   └── 08-search-services.md
 │
-├── patterns-and-paradigms/           # Architectural patterns
+├── 04-patterns-and-paradigms/         # 🏗️ Architectural patterns
 │   ├── 01-microservices-vs-monolith.md
 │   ├── 02-event-driven.md
 │   ├── 03-pub-sub.md
 │   ├── 04-grpc-vs-rest.md
 │   └── 05-sagas-cqrs.md
 │
-├── tradeoffs/                        # Decision-making frameworks
+├── 05-tradeoffs/                      # ⚖️ Decision-making frameworks
 │   ├── 01-sql-vs-nosql.md
 │   ├── 02-consistency-vs-availability.md
 │   ├── 03-sync-vs-async.md
@@ -76,31 +84,23 @@ maang-system-design-playbook/
 │   ├── 05-polling-vs-streaming.md
 │   └── 06-cost-vs-performance.md
 │
-├── interview-skills/                 # How to interview
-│   ├── 01-maang-interview-flow.md
-│   ├── 02-clarifying-questions.md
-│   ├── 03-how-to-communicate.md
-│   ├── 04-how-to-explain-tradeoffs.md
-│   ├── 05-common-interview-phrases.md
-│   └── 06-sample-interviews.md
+├── 06-case-studies/                   # 💼 Practice problems
+│   ├── 01-url-shortener.md
+│   ├── 02-chat-system.md
+│   ├── 03-rate-limiter.md
+│   ├── 04-notification-system.md
+│   ├── 05-file-storage.md
+│   ├── 06-news-feed.md
+│   ├── 07-search-autocomplete.md
+│   └── 08-load-balancing-at-scale.md
 │
-├── diagrams-as-text/                 # Visual patterns
-│   ├── 01-basic-components.txt
-│   ├── 02-system-patterns.txt
-│   └── 03-common-architecture-patterns.md
-│
-└── case-studies/                     # Practice problems
-    ├── 01-url-shortener.md
-    ├── 02-chat-system.md
-    ├── 03-rate-limiter.md
-    ├── 04-notification-system.md
-    ├── 05-file-storage.md
-    ├── 06-news-feed.md
-    ├── 07-search-autocomplete.md
-    └── 08-load-balancing-at-scale.md
+└── 07-diagrams-as-text/               # 📊 Visual reference
+    ├── 01-basic-components.txt
+    ├── 02-system-patterns.txt
+    └── 03-common-architecture-patterns.md
 ```
 
-> **Note**: Files are numbered in recommended learning order. Start with `01-` in each directory and progress sequentially.
+> **Note**: Both directories and files are numbered in recommended learning order. Start with `01-` and progress sequentially through each section.
 
 ---
 
@@ -241,14 +241,15 @@ This sentence matters more than the diagram.
 
 **For Interview Prep (Recommended Path):**
 
-1. **Start Here**: Read `interview-skills/01-maang-interview-flow.md` to understand the 45-minute structure
+1. **Start Here**: Read `01-interview-skills/01-maang-interview-flow.md` to understand the 45-minute structure
 2. **Learn the Format**: Memorize the 11-step framework (Problem → Clarifying → Requirements → ... → Common Mistakes)
-3. **Master Fundamentals**: Read `fundamentals/` in order (01 → 07) to build your foundation
-4. **Study Building Blocks**: Understand `building-blocks/` in order (01 → 08) - components you'll use
-5. **Learn Patterns**: Study `patterns-and-paradigms/` (01 → 05) - architectural approaches
-6. **Internalize Trade-offs**: Study `tradeoffs/` (01 → 06) - decision-making frameworks
-7. **Practice Case Studies**: Work through `case-studies/` (01 → 08) one by one, speaking your answers aloud
+3. **Master Fundamentals**: Read `02-fundamentals/` in order (01 → 07) to build your foundation
+4. **Study Building Blocks**: Understand `03-building-blocks/` in order (01 → 08) - components you'll use
+5. **Learn Patterns**: Study `04-patterns-and-paradigms/` (01 → 05) - architectural approaches
+6. **Internalize Trade-offs**: Study `05-tradeoffs/` (01 → 06) - decision-making frameworks
+7. **Practice Case Studies**: Work through `06-case-studies/` (01 → 08) one by one, speaking your answers aloud
 8. **Simulate Interviews**: Pick a random case study, set a 45-minute timer, and design it end-to-end
+9. **Reference Diagrams**: Use `07-diagrams-as-text/` as visual reference during practice
 
 **Pro Tips:**
 
