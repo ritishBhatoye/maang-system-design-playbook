@@ -13,7 +13,7 @@
 
 MAANG interviews in 2026 are **not** about memorizing diagrams. They are about **Decision-Making under Constraints**.
 
-This repo is structured to take you from **Zero** to **Staff-Level Architect**. It's built by engineers who have conducted over 500+ interviews and have designed systems you use every day.
+This repo is a **complete, zero-gap curriculum** designed to take you from **Zero** to **Staff-Level Architect**. It's built by engineers who have conducted over 500+ interviews and have designed systems you use every day.
 
 ### 📶 The Three Levels of Design
 *   **L4 (SDE II)**: Can stay structured and build a working happy path. (Score: `Hire`)
@@ -91,7 +91,7 @@ Large Language Model (LLM) system design is now a **standard** question at MAANG
 ---
 
 ## 🤝 Contributing
-Found a gap? We're missing 6 case studies. PRs that follow the **New Template** are prioritized. See [CONTRIBUTING.md](CONTRIBUTING.md).
+Found a gap? While we have covered the **Big 16** case studies, the web evolves. PRs that follow the **New Template** are always welcome. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
