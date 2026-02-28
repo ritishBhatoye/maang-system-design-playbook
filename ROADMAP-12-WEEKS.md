@@ -82,3 +82,54 @@ This roadmap is designed by a Senior Staff Engineer to take you from "knowing th
 ## 🏆 The "Final Boss" Challenge
 **Design a system that ranks 1B ads per second across 3 continents with <50ms P99 latency.** 
 *If you can answer this without sweating, you are ready for Staff (L6).*
+
+---
+
+## 📅 6-Week Intensive Sprint (Alternative)
+
+> **For those who need faster preparation (interview in 6 weeks)**
+
+### Week 1-2: Fundamentals Deep Dive
+| Day | Topic | Practice |
+|-----|-------|----------|
+| 1-2 | CAP Theorem, PACELC | Explain with real examples |
+| 3-4 | Database: SQL vs NoSQL | Choose DB for 3 scenarios |
+| 5-6 | Caching strategies | Design cache for Twitter |
+| 7 | Message Queues | Design notification system |
+
+### Week 3-4: Building Blocks Mastery
+| Day | Topic | Practice |
+|-----|-------|----------|
+| 8-9 | API Design | Design CRUD API for e-commerce |
+| 10-11 | Data Modeling | Design schema for Uber |
+| 12-13 | Load Balancing, CDNs | Design CDN architecture |
+| 14 | **Mock Interview 1** | Record and review |
+
+### Week 5-6: Case Studies & Advanced
+| Day | Topic | Practice |
+|-----|-------|----------|
+| 15-17 | Twitter/X Design | Full design with 2 mocks |
+| 18-20 | Payment System | Focus on consistency |
+| 21-23 | Multi-region, Chaos | Design DR strategy |
+| 24 | **Mock Interview 2** | Feedback from peer |
+| 25-27 | Real-world failures | Study 5+ postmortems |
+| 28 | **Mock Interview 3** | Timed practice |
+
+---
+
+## 🎯 Level-Specific Preparation
+
+### L4 (SDE II) - 6 weeks
+- Focus on completing happy path
+- Master 4 easy case studies
+- Practice speaking while drawing
+
+### L5 (Senior) - 12 weeks
+- Master all 16 case studies
+- Quantify every decision
+- Handle 3+ follow-ups
+
+### L6 (Staff) - Add 4 weeks
+- Multi-region design
+- Cost modeling
+- Organizational thinking

@@ -1,10 +1,42 @@
-# ✅ System Design Proficiency Checklist (L5 vs L6)
+# ✅ System Design Proficiency Checklist (L4 vs L5 vs L6)
 
 > **"A Senior Engineer builds the correct system. A Staff Engineer builds the correct system that survives the wrong conditions."**
 
 Use this checklist to self-evaluate. If you can't check a box, you aren't ready for that level.
 
 ---
+
+## 🟢 L4 (SDE II) — "The Implementer"
+
+### 1. Basics
+- [ ] Can explain the difference between vertical and horizontal scaling
+- [ ] Can describe what a Load Balancer does (L4 vs L7)
+- [ ] Can explain why caching improves performance
+- [ ] Knows the difference between SQL and NoSQL databases
+- [ ] Can draw a basic 3-tier architecture
+
+### 2. Communication
+- [ ] Can stay structured during a 45-minute interview
+- [ ] Asks clarifying questions before diving into solution
+- [ ] Can explain their design while drawing
+- [ ] Can handle simple follow-up questions
+
+### 3. Case Studies (Easy)
+- [ ] **URL Shortener**: Can design basic create + redirect flow
+- [ ] **Rate Limiter**: Can explain token bucket concept
+- [ ] **Cache**: Can describe cache-aside pattern
+
+### 4. Technical Foundation
+- [ ] Can estimate simple QPS (requests per second)
+- [ ] Understands HTTP methods (GET, POST, PUT, DELETE)
+- [ ] Knows basic database indexing concepts
+- [ ] Can explain what ACID means
+
+### Red Flags for L4
+- No structure or framework
+- Doesn't ask questions
+- Can't draw basic architecture
+- Single point of failure everywhere
 
 ## 🟦 Senior SDE (L5) — "The Architect"
 
