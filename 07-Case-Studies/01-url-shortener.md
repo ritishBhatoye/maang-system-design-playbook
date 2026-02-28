@@ -1,166 +1,139 @@
-# 🔗 URL Shortener (2026 MAANG Edition)
+# 🔗 URL Shortener (Standard vs. Staff Level)
 
-## 1. Problem Statement
-
-Design a system like **bit.ly** that shortens long URLs and redirects users at scale.
+> **Staff-Signal**: It's the "Hello World" of system design. Can you move past the basics and discuss distributed ID generation, collision handling, and caching hot-keys?
 
 ---
 
-## 2. Clarifying Questions (Ask First)
+## 1. Problem Statement
+Design a service like **bit.ly** or **tinyurl.com** that shortens a long URL and redirects users.
 
-* Expected read vs write ratio? (Typically 100:1 or 10:1)
-* Custom aliases required? (e.g., bit.ly/my-link)
-* URL expiration needed? (TTL for short URLs)
-* Global or regional traffic? (Affects CDN strategy)
-* Analytics required? (Click tracking, geolocation)
+---
+
+## 2. Clarifying Questions
+*   **Scale**: 100M URLs created per day. 10B total URLs.
+*   **Custom URLs**: Do we support custom aliases (e.g., `bit.ly/my-sale`)? (Yes, if available).
+*   **Analytics**: Do we track click counts? (Yes).
+*   **Lifecycle**: Do URLs expire? (Default 5 years).
 
 ---
 
 ## 3. Requirements
-
 ### Functional
-
-* Generate short URLs from long URLs
-* Redirect short URL → original URL
-* Handle custom aliases (optional)
-* URL expiration (optional)
-* Analytics (optional)
-
+*   Generate a unique short link for a given long URL.
+*   Redirect short link → original long URL.
+*   Support custom aliases.
 ### Non-Functional
-
-* Low latency redirects (<50ms p95)
-* Highly available (99.99%)
-* Horizontally scalable
-* Durable (URLs don't get lost)
+*   **Low Latency**: Redirects should be < 20ms at P99.
+*   **Persistence**: Once link is created, it cannot be lost.
+*   **Scalability**: Handle 150K+ reads per second.
 
 ---
 
-## 4. Scale Assumptions
-
-* 100M URLs created per day
-* 10:1 read/write ratio (1B reads/day)
-* Peak QPS: ~15K writes, ~150K reads
-* Average URL length: 100 characters
-* Storage: ~10B URLs × 100 bytes = 1TB (raw), ~3TB with replication
-* URLs never deleted (or 5-year retention)
+## 4. Capacity Estimation (Worked Math)
+*   **Write QPS**: 100M / 86400s ≈ **1,200 writes/sec**.
+*   **Read QPS**: Assume 100:1 read/write ratio. **120,000 reads/sec**.
+*   **Storage (5 years)**: 100M * 365 * 5 = **182 Billion URLs**.
+*   **Size**: id (8B) + url (500B) + metadata ≈ 512 bytes.
+*   **Total Disk**: 182B * 512B ≈ **100 Terabytes**.
 
 ---
 
-## 5. High-Level Architecture
-
+## 5. API Design
+### `POST /v1/shorten`
+```json
+{
+  "long_url": "https://example.com/very/long/path",
+  "alias": "optional-custom-name"
+}
 ```
-Client → Load Balancer → API Service (stateless)
-                       → Cache (Redis) - Hot URLs
-                       → Database (NoSQL) - All URLs
-                       → ID Generator Service
+**Response**: `201 Created` with `{"short_url": "t.co/xyz123"}`.
+
+### `GET /:short_id`
+Returns `301 Moved Permanently`. (Important: Use 301 for SEO and to let the browser cache the redirect).
+
+---
+
+## 6. Data Model (NoSQL for Scale)
+A simple Key-Value store is best. Shard by `short_id`.
+*   **Table: ShortURL**
+    *   `short_id` (Partition Key - Base62 encoded)
+    *   `long_url`
+    *   `created_at`, `expires_at`
+
+---
+
+## 7. High-Level Architecture
+```mermaid
+graph TB
+    User((User)) --> LB[Load Balancer]
+    LB --> API[API Service]
+    API --> Cache[(Redis)]
+    API --> DB[(NoSQL: DynamoDB)]
+    API --> ID_Gen[Distributed ID Generator]
 ```
 
 ---
 
-## 6. Core Components
-
-* **API Service**: Handles create/redirect requests (stateless)
-* **ID Generator**: Generates unique short codes (Base62 encoding)
-* **Cache (Redis)**: Stores hot URLs for fast redirects
-* **Database (NoSQL)**: Persistent storage (DynamoDB/Cassandra)
-* **Load Balancer**: Distributes traffic
-
-**ID Generation Options:**
-1. **Counter-based**: Single counter service → Base62 encode (collision risk if multiple instances)
-2. **Hash-based**: MD5/SHA of long URL → Take first 7 chars (collision possible, need checking)
-3. **Distributed ID**: Snowflake/Twitter ID → Base62 encode (best for scale)
+## 8. Component Deep Dive: Distributed ID Generation
+How do we generate 10B unique IDs without collision?
+1.  **MD5/SHA Hash**: Take MD5 of long URL, take first 7 chars.
+    - **Problem**: Collisions are possible. Requires constant DB checking.
+2.  **Range Handler (Zookeeper)**:
+    - **Winner**: A central service assigns a "Range" of IDs (e.g., 1 to 1M) to each server. Servers increment locally. No coordination needed for 1M writes.
+    - When a server exhaustion its range, it asks Zookeeper for a new one.
 
 ---
 
-## 7. Data Flow
-
-**Write Flow (Create Short URL)**
-1. Client → POST /api/v1/shorten {long_url}
-2. API → Validate URL
-3. API → Generate unique ID (from ID generator)
-4. API → Check if custom alias (if provided)
-5. API → Store mapping: short_code → long_url in DB
-6. API → Store in cache (optional, for hot URLs)
-7. API → Return short URL: bit.ly/{short_code}
-
-**Read Flow (Redirect)**
-1. Client → GET bit.ly/{short_code}
-2. Load Balancer → Route to API server
-3. API → Check cache (Redis) for short_code
-4. If cache hit → Return 302 redirect to long_url (<10ms)
-5. If cache miss → Query database
-6. If found → Store in cache (with TTL), return 302
-7. If not found → Return 404
-
-**ID Generator Flow (Distributed)**
-1. Multiple ID generator instances
-2. Each instance has unique machine ID
-3. Generate ID: timestamp + machine_id + sequence
-4. Encode to Base62 (0-9, a-z, A-Z) → 7 characters = 62^7 = 3.5T unique URLs
+## 9. Data Flow (Implementation)
+1.  **Write**: User sends URL -> Server pulls ID from local range -> Save to DB & Cache -> Return.
+2.  **Read**: User hits short link -> Check Redis -> If Miss, Check DB -> Populate Cache -> 301 Redirect.
 
 ---
 
-## 8. Bottlenecks
-
-* **ID Generation Collisions**: Multiple instances generating same ID
-  * Solution: Distributed ID generator (Snowflake), or single counter with locks
-* **Cache Misses**: Hot URLs not in cache
-  * Solution: Pre-warm cache for popular URLs, increase cache size
-* **Database Write Bottleneck**: 15K writes/sec to single DB
-  * Solution: Shard database by short_code hash, or use managed NoSQL (DynamoDB)
-* **Hot Keys**: Single short_code gets all traffic (viral URL)
-  * Solution: Cache with replication, or CDN for redirects
-* **Database Read Bottleneck**: 150K reads/sec
-  * Solution: Aggressive caching (80%+ hit rate), read replicas
+## 10. Bottlenecks & Caching
+*   **Hot Keys**: A viral tweet causes 1M hits on one `short_id`.
+    *   **Solution**: Redis cluster with LRU eviction. At 150k QPS, memory-native cache is mandatory.
 
 ---
 
-## 9. Trade-offs
-
-| Decision | Choice | Why | Trade-off |
-|----------|--------|-----|-----------|
-| **Database** | NoSQL (DynamoDB) | Horizontal scale for writes, simple key-value lookups | Lose complex queries, but don't need them |
-| **ID Generation** | Distributed ID (Snowflake) | No collisions, scalable | More complex than counter, but necessary at scale |
-| **Caching Strategy** | Cache-aside with TTL | Simple, cache hot URLs | May serve stale data if URL updated (rare) |
-| **Custom Aliases** | Store in same DB with check | Simple | Need to check uniqueness, but acceptable |
-| **URL Expiration** | TTL in DB, background job to delete | Don't block redirects | Eventual cleanup, acceptable |
-
-**Key Trade-off:**
-> "I optimize for read latency using aggressive caching (Redis) because traffic is 10:1 read-heavy. I accept eventual consistency between cache and DB for better scalability. The trade-off is a small chance of serving stale redirects, but URL updates are rare."
+## 11. Scaling Strategy
+*   **Database**: Shard by `short_id` hash. 
+*   **Compute**: API servers are stateless; scale horizontally in an Auto-scaling group.
 
 ---
 
-## 10. How to Explain This in an Interview
-
-> "I'll start with a stateless API service behind a load balancer. For ID generation, I use a distributed ID generator (like Snowflake) to avoid collisions at scale. I encode IDs to Base62 to get 7-character short codes, which gives us 3.5 trillion unique URLs - more than enough.
->
-> For storage, I use NoSQL (DynamoDB) sharded by short_code because we need horizontal write scaling for 15K writes/sec, and our access pattern is simple key-value lookups. The trade-off is we lose complex queries, but we don't need them.
->
-> For redirects, I use Redis cache with cache-aside pattern. Since reads are 10x writes, I optimize for read latency. I target 80%+ cache hit rate, which means only 30K reads/sec hit the database - manageable with read replicas.
->
-> If a URL goes viral, I handle hot keys by caching with replication and potentially using CDN for redirects. For custom aliases, I check uniqueness in the database before storing."
-
-**Key Phrases:**
-* "Optimize for read latency because traffic is read-heavy"
-* "Use NoSQL for horizontal write scaling"
-* "Distributed ID generator to avoid collisions"
-* "Cache-aside pattern with 80%+ hit rate target"
+## 12. Failure Scenarios
+*   **ID Generator Down**: Use pre-fetched ranges on the API servers to survive a 1-hour outage of the generator.
+*   **DB Slow Down**: Redirect path should prioritize Cache.
 
 ---
 
-## 11. Common Mistakes
+## 13. Tradeoffs
 
-* **Skipping scale assumptions**: "We need a database"
-  * Fix: Always state numbers: "15K writes/sec, 150K reads/sec"
-* **Not justifying database choice**: "We use MySQL"
-  * Fix: "We use NoSQL because we need horizontal write scaling for 15K writes/sec"
-* **Hash-based ID without collision handling**: "MD5 hash, take first 7 chars"
-  * Fix: Check for collisions, or use distributed ID generator
-* **No caching strategy**: "All reads go to database"
-  * Fix: "Redis cache with 80% hit rate reduces DB load by 5x"
-* **Forgetting custom aliases**: "Only auto-generated codes"
-  * Fix: Mention uniqueness check if custom aliases required
-* **Not handling hot keys**: "Cache handles everything"
-  * Fix: "For viral URLs, we use cache replication or CDN"
-* **Single point of failure**: "One ID generator"
-  * Fix: "Distributed ID generator with multiple instances"
+| Topic | Pro | Con |
+| :--- | :--- | :--- |
+| **Base62 Encoding** | Highly readable URLs | Limited character set |
+| **301 vs 302 Redirect** | 301 (Permanent) reduces server load | No analytics on subsequent clicks |
+
+---
+
+## 14. Monitoring Strategy
+*   **Cache Hit Rate**: Monitor percentage of redirects served from Redis.
+*   **ID Range Exhaustion**: Alert if the Zookeeper range pool is < 20%.
+
+---
+
+## 15. The Interview Narrative
+> "To build a URL shortener at 100M URL/day scale, I prioritize write-throughput and read-latency. I utilize a **Distributed ID Generator** with range-based pre-fetching via Zookeeper to ensure collision-free keys without a central bottleneck. For high-speed redirects, I use a **Redis-first** read strategy with 301 status codes to leverage browser-side caching, while sharding the underlying **NoSQL store** by the short ID for horizontal scalability."
+
+---
+
+## 16. Follow-up Questions
+1.  **"How do you prevent malicious URLs?"** (Answer: Integrate with Google Safe Browsing API during shorten phase).
+
+---
+
+## 17. Common Mistakes
+1.  **Using a single SQL database** for 100TB of data without a sharding strategy.
+2.  **Hashing logic without collision handling**.
+3.  **Forgetting about the 'Custom Alias' conflict** (Custom aliases can't be part of the range-based IDs).
