@@ -50,4 +50,50 @@
 *   "Crucially, this design favors **Availability over Consistency** because..."
 *   "Operational cost is a concern here; managed S3 is better than running our own Ceph cluster."
 *   "To minimize the **Blast Radius** of a deployment error, we will use..."
-*   "This is an **L-7 bottleneck**, so a simple Round-Robin LB won't suffice."
+*   "This is an **L-7 bottleneck**, soobin LB won't suffice."
+
+---
+
+## What a simple Round-R They Write After You Leave
+
+### "The Good" (Pass)
+- "Great scoping - defined MVP and knew what to defer"
+- "Solid quantitative reasoning - did back-of-envelope math correctly"
+- "When I pushed on failures, they had thoughtful degradation strategies"
+- "Good depth - could explain why Cassandra over Mongo for this workload"
+
+### "The Bad" (Lean Hire)
+- "Technically correct but shallow - couldn't go deeper on follow-ups"
+- "No quantification - just said 'scale' without numbers"
+- "Didn't discuss failure modes until I prompted"
+- "Struggled with the sharding strategy question"
+
+### "The Ugly" (No Hire)
+- "Fundamentally got the architecture wrong"
+- "Chose technology without understanding tradeoffs"
+- "Arrogant when I pushed back - wouldn't admit uncertainty"
+- "No idea about basic concepts like consistent hashing"
+
+---
+
+## The Follow-Up Questions They Actually Ask
+
+1. **"What happens if that component fails?"** → Tests failure thinking
+2. **"Why that database over X?"** → Tests tradeoff reasoning
+3. **"How would you scale this 10x?"** → Tests scaling knowledge
+4. **"What monitoring would you add?"** → Tests production awareness
+5. **"How much does this cost?"** → Tests cost consciousness (L6+)
+6. **"What are the security implications?"** → Tests security thinking
+7. **"How would you migrate from legacy?"** → Tests operational thinking
+8. **"What's the blast radius if this goes wrong?"** → Tests chaos engineering
+
+---
+
+## Level Calibration Quick Reference
+
+| Your Level | Interviewer Expectation |
+|------------|------------------------|
+| L4 | Stay structured, complete happy path, use basic building blocks correctly |
+| L5 | Quantify decisions, handle 2-3 follow-ups, discuss tradeoffs with reasons |
+| L6 | Scope MVP vs V2, multi-region thinking, cost analysis, failure-first design |
+| L7 | Organizational impact, strategic alignment, build-vs-buy reasoning |
